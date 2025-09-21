@@ -5,14 +5,13 @@ namespace Live.AndrewCrossan.Tagging.Models;
 /// It includes properties for the tag's name, description, and slug.
 /// Inherits from <c>BaseEntity</c> to include common entity properties.
 /// </summary>
-public class Tag : BaseEntity<Guid>
+public class Tag : BaseTag
 {
-    public required string Name { get; set; }
     public string? Description { get; set; }
-    public required string Slug { get; set; }
-    
-    public Tag()
+    public string Slug { get; set; }
+
+    public Tag() : base()
     {
-        Active = true;
+        
     }
 }
