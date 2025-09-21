@@ -28,7 +28,7 @@ public class TaggingDbContext<TEntity, TJoin, TKey, TTag> : DbContext
         
         modelBuilder.Entity<TJoin>()
             .HasOne(tt => tt.Entity)
-            .WithMany()
+            .WithMany("Tags")
             .HasForeignKey(tt => tt.EntityId);
     }
 
@@ -48,11 +48,11 @@ public class TaggingDbContext<TEntity, TJoin, TKey, TTag> : DbContext
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e.Entity is BaseEntity<Guid> && (e.State == EntityState.Added || e.State == EntityState.Modified));
+            .Where(e => e.Entity is BaseEntity<Guid, TJoin> && (e.State == EntityState.Added || e.State == EntityState.Modified));
 
         foreach (var entry in entries)
         {
-            var entity = (BaseEntity<Guid>)entry.Entity;
+            var entity = (BaseEntity<Guid, TJoin>)entry.Entity;
             
             if (entry.State == EntityState.Added)
             {
