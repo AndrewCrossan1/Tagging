@@ -5,15 +5,15 @@ using NUnit.Framework;
 
 namespace Live.AndrewCrossan.Tagging.Tests.ModelsTest;
 
-public class PostTag : ITaggableEntity<Post, int, Tag>
+public class PostTag : ITaggableEntity<Post, Tag>
 {
-    public int EntityId { get; set; }
+    public Guid EntityId { get; set; }
     public Post Entity { get; set; }
     public Guid TagId { get; set; }
     public Tag Tag { get; set; }
 }
 
-public class Post : BaseEntity<int, PostTag>, ITaggableModel<int>
+public class Post : BaseEntity<PostTag>, ITaggableModel
 {
     public string Title { get; set;}
     public string Content { get; set; }
@@ -33,7 +33,7 @@ public class CanBeTagged
     }
     
     // The DbContext for your application, which uses your generic library
-    public class PostsApplicationDbContext : TaggingDbContext<Post, PostTag, int, Tag>
+    public class PostsApplicationDbContext : TaggingDbContext<Post, PostTag, Tag>
     {
         public PostsApplicationDbContext(DbContextOptions<PostsApplicationDbContext> options) : base(options) { }
         

@@ -5,10 +5,10 @@ namespace Live.AndrewCrossan.Tagging.Models;
 /// This includes an Id, CreatedAt, UpdatedAt, and Active status.
 /// This ensures consistency across all entities in the system.
 /// </summary>
-/// <typeparam name="TKey">The Primary Key Type</typeparam>
-public class BaseEntity<TKey, TJoin>
+/// <typeparam name="TJoin">The Tag model to use</typeparam>
+public class BaseEntity<TJoin>
 {
-    public TKey Id { get; set; }
+    public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public bool Active { get; set; }

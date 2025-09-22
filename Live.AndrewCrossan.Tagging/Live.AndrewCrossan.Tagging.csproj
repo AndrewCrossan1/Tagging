@@ -14,10 +14,7 @@
 
     <ItemGroup>
       <Folder Include="DTOs\" />
-      <Folder Include="Extensions\" />
       <Folder Include="Managers\" />
-      <Folder Include="Options\" />
-      <Folder Include="Repositories\" />
       <Folder Include="Validation\" />
     </ItemGroup>
 

@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Live.AndrewCrossan.Tagging.Context;
 
-public class TaggingDbContext<TEntity, TJoin, TKey, TTag> : DbContext
-    where TEntity : class, ITaggableModel<TKey>
-    where TJoin : class, ITaggableEntity<TEntity, TKey, TTag>, new()
+public class TaggingDbContext<TEntity, TJoin, TTag> : DbContext
+    where TEntity : class, ITaggableModel
+    where TJoin : class, ITaggableEntity<TEntity, TTag>, new()
     where TTag : class, ITag
 {
     public TaggingDbContext(DbContextOptions options) : base(options) {}
     
-    public DbSet<TTag> Tags { get; set; }
     public DbSet<TJoin> TaggableEntities { get; set; }
+    public DbSet<TTag> Tags { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,11 +48,11 @@ public class TaggingDbContext<TEntity, TJoin, TKey, TTag> : DbContext
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e.Entity is BaseEntity<Guid, TJoin> && (e.State == EntityState.Added || e.State == EntityState.Modified));
+            .Where(e => e.Entity is BaseEntity<TJoin> && (e.State == EntityState.Added || e.State == EntityState.Modified));
 
         foreach (var entry in entries)
         {
-            var entity = (BaseEntity<Guid, TJoin>)entry.Entity;
+            var entity = (BaseEntity<TJoin>)entry.Entity;
             
             if (entry.State == EntityState.Added)
             {

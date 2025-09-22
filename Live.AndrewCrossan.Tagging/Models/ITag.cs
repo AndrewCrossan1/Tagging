@@ -7,4 +7,6 @@ public interface ITag
 {
     Guid Id { get; set; }
     string Name { get; set; }
+    DateTime CreatedAt { get; set; }
+    DateTime UpdatedAt { get; set; }
 }
