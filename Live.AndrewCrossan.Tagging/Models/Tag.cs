@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Live.AndrewCrossan.Tagging.Models;
 
 /// <summary>
@@ -7,6 +9,10 @@ namespace Live.AndrewCrossan.Tagging.Models;
 /// </summary>
 public class Tag : BaseTag
 {
+    [MaxLength(100)]
     public string? Description { get; set; }
-    public string Slug { get; set; }
+
+    [Required]
+    [MaxLength(100)]
+    public string Slug => Name?.ToLower().Replace(" ", "-") ?? string.Empty;
 }
