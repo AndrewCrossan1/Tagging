@@ -2,6 +2,7 @@ using Live.AndrewCrossan.Tagging.Models;
 using Live.AndrewCrossan.Tagging.Options;
 using Live.AndrewCrossan.Tagging.Validation;
 using Live.AndrewCrossan.Tagging.Repositories;
+using Live.AndrewCrossan.Tagging.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Live.AndrewCrossan.Tagging.Managers;
@@ -17,7 +18,7 @@ public class TagManager<TTag>
 {
     private readonly ITagRepository<TTag> _repository;
     private readonly ITagValidator<TTag> _validator;
-    private readonly ILogger<TagManager<TTag>> _logger;
+    private readonly ILogger _logger;
     private readonly TaggingOptions _options;
     
     public TagManager(ILogger<TagManager<TTag>> logger, ITagRepository<TTag> repository, ITagValidator<TTag> validator,TaggingOptions options)
@@ -48,7 +49,7 @@ public class TagManager<TTag>
         
         if (uniqueTagNames.Count > _options.MaximumTagsPerEntity) 
         {
-            _logger.LogWarning("Tag limit exceeded. Maximum allowed is {MaxTags}, but {ProvidedTags} were provided.", _options.MaximumTagsPerEntity, uniqueTagNames.Count);
+            _logger.TagLimitExceeded(_options.MaximumTagsPerEntity, uniqueTagNames.Count);
             throw new TagConfigurationException($"A maximum of {_options.MaximumTagsPerEntity} tags are allowed per entity.");
         }
 
@@ -63,17 +64,17 @@ public class TagManager<TTag>
         foreach (var newTag in newTags)
         {
             if (await _validator.ValidateAsync(newTag)) continue;
-            _logger.LogWarning("Tag validation failed for new tag: {TagName}", newTag.Name);
+            _logger.TagValidationFailed(newTag.Name, _validator.Errors);
             throw new TagValidationException("Tag validation failed", _validator.Errors);
         }
 
         if (newTags.Count > 0)
         {
-            _logger.LogInformation("Creating {Count} new tags.", newTags.Count);
+            _logger.CreatingNewTags(newTags.Count);
             await _repository.SaveRangeAsync(newTags);
         }
 
-        _logger.LogInformation("Returning a total of {TotalCount} tags (existing and new).", existingTags.Count + newTags.Count);
+        _logger.ReturningTotalTags(existingTags.Count + newTags.Count);
         return existingTags.Union(newTags).ToList();
     }
     
@@ -92,18 +93,18 @@ public class TagManager<TTag>
         var validationResult = await _validator.ValidateAsync(tag);
         if (!validationResult)
         {
-            _logger.LogWarning("Tag validation failed for tag: {TagName}. Errors: {Errors}", tag.Name, _validator.Errors);
+            _logger.TagValidationFailed(tag.Name, _validator.Errors);
             throw new TagValidationException("Tag validation failed", _validator.Errors);
         }
 
         var existingTag = await _repository.TagExistsAsync(tag.Name);
         if (existingTag != null)
         {
-            _logger.LogInformation("Tag with name {TagName} already exists. Returning existing tag.", tag.Name);
+            _logger.TagAlreadyExists(tag.Name);
             return existingTag;
         }
         
-        _logger.LogInformation("Creating new tag with name: {TagName}", tag.Name);
+        _logger.CreatingNewTag(tag.Name);
 
         return await _repository.CreateTagAsync(tag);
     }
@@ -122,11 +123,11 @@ public class TagManager<TTag>
         var existingTag = await _repository.TagExistsAsync(tagId);
         if (existingTag == null)
         {
-            _logger.LogWarning("Attempted to delete non-existent tag with ID: {TagId}", tagId);
+            _logger.DeletingNonExistentTag(tagId);
             throw new KeyNotFoundException($"Tag with ID {tagId} not found.");
         }
         
-        _logger.LogInformation("Deleting tag with ID: {TagId}", tagId);
+        _logger.DeletingTag(tagId);
 
         return await _repository.DeleteTagAsync(tagId);
     }
@@ -155,11 +156,11 @@ public class TagManager<TTag>
         
         if (tag != null)
         {
-            _logger.LogInformation("Tag with ID {TagId} retrieved successfully.", tagId);
+            _logger.TagRetrieved(tagId);
         }
         else
         {
-            _logger.LogWarning("Tag with ID {TagId} not found.", tagId);
+            _logger.TagNotFound(tagId);
         }
         
         return tag ?? throw new KeyNotFoundException($"Tag with ID {tagId} not found.");
