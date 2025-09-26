@@ -1,4 +1,5 @@
 using Live.AndrewCrossan.Tagging.Models;
+using Live.AndrewCrossan.Tagging.Options;
 using Live.AndrewCrossan.Tagging.Validation;
 using Live.AndrewCrossan.Tagging.Repositories;
 using Microsoft.Extensions.Logging;
@@ -17,12 +18,14 @@ public class TagManager<TTag>
     private readonly ITagRepository<TTag> _repository;
     private readonly ITagValidator<TTag> _validator;
     private readonly ILogger<TagManager<TTag>> _logger;
+    private readonly TaggingOptions _options;
     
-    public TagManager(ILogger<TagManager<TTag>> logger, ITagRepository<TTag> repository, ITagValidator<TTag> validator)
+    public TagManager(ILogger<TagManager<TTag>> logger, ITagRepository<TTag> repository, ITagValidator<TTag> validator,TaggingOptions options)
     {
         _repository = repository;
         _validator = validator;
         _logger = logger;
+        _options = options;
     }
 
     /// <summary>
@@ -42,6 +45,12 @@ public class TagManager<TTag>
             .Select(name => name.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
+        
+        if (uniqueTagNames.Count > _options.MaximumTagsPerEntity) 
+        {
+            _logger.LogWarning("Tag limit exceeded. Maximum allowed is {MaxTags}, but {ProvidedTags} were provided.", _options.MaximumTagsPerEntity, uniqueTagNames.Count);
+            throw new TagConfigurationException($"A maximum of {_options.MaximumTagsPerEntity} tags are allowed per entity.");
+        }
 
         var existingTags = await _repository.GetTagsByNamesAsync(uniqueTagNames);
         var existingTagNames = existingTags.Select(t => t.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
