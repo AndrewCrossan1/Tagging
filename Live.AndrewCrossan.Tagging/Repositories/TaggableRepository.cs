@@ -10,6 +10,11 @@ public class TaggableRepository<TEntity, TJoin, TTag> : ITaggableRepository<TEnt
 {
     private readonly TaggingDbContext<TEntity, TJoin, TTag> _context;
     
+    public TaggableRepository(TaggingDbContext<TEntity, TJoin, TTag> context)
+    {
+        _context = context;
+    }
+    
     public Task AddTagToEntityAsync(TEntity entity, TTag tag, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();

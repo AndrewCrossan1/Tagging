@@ -1,4 +1,3 @@
-using Live.AndrewCrossan.Tagging.Context;
 using Live.AndrewCrossan.Tagging.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +8,11 @@ public class TagRepository<TTag> : ITagRepository<TTag>
 {
 
     private readonly DbContext _context;
+    
+    public TagRepository(DbContext context)
+    {
+        _context = context;
+    }
     
     public Task<ICollection<TTag>> GetAllTagsAsync(CancellationToken cancellationToken = default)
     {
