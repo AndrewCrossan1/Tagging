@@ -14,8 +14,6 @@
 
     <ItemGroup>
       <Folder Include="DTOs\" />
-      <Folder Include="Managers\" />
-      <Folder Include="Validation\" />
     </ItemGroup>
 
 </Project>
