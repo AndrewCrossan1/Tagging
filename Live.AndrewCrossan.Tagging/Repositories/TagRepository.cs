@@ -1,27 +1,21 @@
 using Live.AndrewCrossan.Tagging.Context;
 using Live.AndrewCrossan.Tagging.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Live.AndrewCrossan.Tagging.Repositories;
 
-public class TagRepository<TEntity, TJoin, TTag> : ITagRepository<TEntity, TJoin, TTag>
+public class TagRepository<TTag> : ITagRepository<TTag>
     where TTag : class, ITag
-    where TEntity : class, ITaggableModel
-    where TJoin : class, ITaggableEntity<TEntity, TTag>, new()
 {
 
-    private readonly TaggingDbContext<TEntity, TJoin, TTag> _context;
+    private readonly DbContext _context;
     
-    public Task<List<TTag>> GetAllTagsAsync(CancellationToken cancellationToken = default)
+    public Task<ICollection<TTag>> GetAllTagsAsync(CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
     public Task<TTag?> GetTagByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<TTag?> GetTagByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -36,17 +30,22 @@ public class TagRepository<TEntity, TJoin, TTag> : ITagRepository<TEntity, TJoin
         throw new NotImplementedException();
     }
 
-    public Task DeleteTagAsync(Guid id, CancellationToken cancellationToken = default)
+    public Task<TTag> DeleteTagAsync(Guid id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> TagExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    public Task<TTag?> TagExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public Task<TTag?> TagExistsAsync(string name, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> TagNameExistsAsync(string name, CancellationToken cancellationToken = default)
+    public Task<ICollection<TTag>> GetTagsByNamesAsync(IEnumerable<string> names, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
