@@ -33,7 +33,7 @@ public static class TaggingServiceCollectionExtensions
         
         // Register the tagging service
         services.TryAddScoped<ITaggableRepository<TEntity, TJoin, TTag>, TaggableRepository<TEntity, TJoin, TTag>>();
-        services.TryAddScoped<ITagRepository<TEntity, TJoin, TTag>, TagRepository<TEntity, TJoin, TTag>>();
+        services.TryAddScoped<ITagRepository<TTag>, TagRepository<TTag>>();
         
         return services;
     }
@@ -55,7 +55,7 @@ public static class TaggingServiceCollectionExtensions
     {
         // Register the tagging service
         services.TryAddScoped<ITaggableRepository<TEntity, TJoin, Tag>, TaggableRepository<TEntity, TJoin, Tag>>();
-        services.TryAddScoped<ITagRepository<TEntity, TJoin, Tag>, TagRepository<TEntity, TJoin, Tag>>();
+        services.TryAddScoped<ITagRepository<Tag>, TagRepository<Tag>>();
         
         return services.AddTagging<TEntity, TJoin, Tag>(configureOptions, configureDbContext);
     }
