@@ -58,7 +58,7 @@ public class TagManager<TTag>
             throw new TagValidationException("Tag validation failed", _validator.Errors);
         }
 
-        if (newTags.Any())
+        if (newTags.Count > 0)
         {
             _logger.LogInformation("Creating {Count} new tags.", newTags.Count);
             await _repository.SaveRangeAsync(newTags);
