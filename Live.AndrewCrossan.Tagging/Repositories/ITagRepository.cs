@@ -13,5 +13,5 @@ public interface ITagRepository<TTag>
     Task<TTag?> TagExistsAsync(string name, CancellationToken cancellationToken = default);
     Task<ICollection<TTag>> GetTagsByNamesAsync(IEnumerable<string> names, CancellationToken cancellationToken = default);
     Task SaveRangeAsync(IEnumerable<TTag> tags, CancellationToken cancellationToken = default);
-    
+    Task<TTag> SaveTagAsync(TTag tag, TTag newTag, CancellationToken cancellationToken = default);   
 }
