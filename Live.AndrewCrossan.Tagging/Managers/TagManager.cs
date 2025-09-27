@@ -36,14 +36,14 @@ public class TagManager<TTag>
     /// If any tag title is invalid, an exception is thrown and no tags are created or retrieved.
     /// This method is useful for batch operations where multiple tags need to be processed at once.
     /// </summary>
-    /// <param name="tagNames">A collection of tag titles</param>
+    /// <param name="tags">A collection of tag titles</param>
     /// <exception cref="TagValidationException">Thrown when validation fails, with 'Errors' property providing a description for each</exception>
     /// <returns>A list of existing or newly created tags</returns>
-    public async Task<ICollection<TTag>> CreateOrGetTagsAsync(IEnumerable<string> tagNames)
+    public async Task<ICollection<TTag>> CreateOrGetTagsAsync(IEnumerable<TTag> tags)
     {
-        var uniqueTagNames = tagNames
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Select(name => name.Trim())
+        var uniqueTagNames = tags
+            .Where(tag => !string.IsNullOrWhiteSpace(tag.Name))
+            .Select(tag => tag.Name.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
         
