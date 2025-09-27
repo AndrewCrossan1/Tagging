@@ -22,17 +22,11 @@ public class TagValidator<TTag> : ITagValidator<TTag>
     /// <param name="tag">The model to validate</param>
     /// <param name="cancellationToken"></param>
     /// <returns>True, if the validation is successful, false otherwise</returns>
-    public Task<bool> ValidateAsync(TTag? tag, CancellationToken cancellationToken = default)
+    public Task<bool> ValidateAsync(TTag tag, CancellationToken cancellationToken = default)
     {
-        // Evaluate each field for null values
-        if (tag == null)
-        {
-            Errors["Tag"] = new List<string> { "Tag cannot be null." };
-        }
-
         if (String.IsNullOrEmpty(tag.Name))
         {
-            Errors["Name"] = new List<string> { "Tag name cannot be null." };
+            Errors[tag.Name] = new List<string> { "Tag name cannot be null." };
         }
         
         return Task.FromResult(Errors.Count == 0);
