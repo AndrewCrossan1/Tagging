@@ -101,7 +101,10 @@ public class TagManager<TTag>
         if (existingTag != null)
         {
             _logger.TagAlreadyExists(tag.Name);
-            return existingTag;
+            validationResult = await _validator.ValidateAsync(tag);
+            if (validationResult) return await _repository.SaveTagAsync(existingTag, tag);
+            _logger.TagValidationFailed(tag.Name, _validator.Errors);
+            throw new TagValidationException("Tag validation failed", _validator.Errors);
         }
         
         _logger.CreatingNewTag(tag.Name);
