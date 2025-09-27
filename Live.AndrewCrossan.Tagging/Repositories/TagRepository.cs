@@ -58,4 +58,9 @@ public class TagRepository<TTag> : ITagRepository<TTag>
     {
         throw new NotImplementedException();
     }
+
+    public Task<TTag> SaveTagAsync(TTag tag, TTag newTag, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }
