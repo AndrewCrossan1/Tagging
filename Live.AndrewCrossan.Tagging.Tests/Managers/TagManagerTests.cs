@@ -36,7 +36,6 @@ public class TagManagerTests
     {
         // Arrange
         var tags = new List<Tag>();
-        List<Guid> ids = new List<Guid>();
 
         for (int i = 0; i < 3; i++)
         {
@@ -45,8 +44,6 @@ public class TagManagerTests
                 Name = "Tag #" + i,
                 Description = "Description for Tag #" + i
             });
-            
-            ids.Add(tags[i].Id);    
         }
         
         _tagRepository.Setup(r => r.GetTagsByNamesAsync(It.IsAny<IEnumerable<string>>(), CancellationToken.None))
@@ -74,7 +71,6 @@ public class TagManagerTests
     {
         // Arrange
         var tags = new List<Tag>();
-        List<Guid> ids = new List<Guid>();
 
         for (int i = 0; i < 3; i++)
         {
@@ -83,8 +79,6 @@ public class TagManagerTests
                 Name = "Tag #" + i,
                 Description = "Description for Tag #" + i
             });
-            
-            ids.Add(tags[i].Id);    
         }
 
         tags[0].Name = "";
@@ -100,15 +94,128 @@ public class TagManagerTests
         Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
     }
     
-    [Test]
-    public async Task SaveTagAsync() {}
+    [Test(Description = "SaveTagAsync | (Tag doesn't exist) | Validation Fails")]
+    public async Task SaveTagAsync_validation_error()
+    {
+        // Arrange
+        var tags = new List<Tag>();
+
+        for (int i = 0; i < 1; i++)
+        {
+            tags.Add(new()
+            {
+                Name = "Tag #" + i,
+                Description = "Description for Tag #" + i
+            });
+        }
+
+        _tagRepository.Setup(r => r.TagExistsAsync(It.IsAny<string>(), CancellationToken.None))
+            .ReturnsAsync((Tag?)null);
+        _validator.Setup(v => v.ValidateAsync(tags[0], CancellationToken.None))
+            .ReturnsAsync(false);
+        
+        Assert.ThrowsAsync<TagValidationException>(async () => await _tagManager.SaveTagAsync(tags[0]));
+        Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
+    }
+
+    [Test(Description = "SaveTagAsync | (Tag doesn't exist) | Validation Okay")]
+    public async Task SaveTagAsync_validation_okay()
+    {
+        // Arrange
+        var tags = new List<Tag>();
+
+        for (int i = 0; i < 1; i++)
+        {
+            tags.Add(new()
+            {
+                Name = "Tag #" + i,
+                Description = "Description for Tag #" + i
+            });
+        }
+        
+        // Act
+        _tagRepository.Setup(r => r.TagExistsAsync(It.IsAny<string>(), CancellationToken.None))
+            .ReturnsAsync((Tag?)null);
+        _validator.Setup(v => v.ValidateAsync(It.IsAny<Tag>(), CancellationToken.None))
+            .ReturnsAsync(true);
+        _tagRepository.Setup(r => r.CreateTagAsync(tags[0], CancellationToken.None))
+            .ReturnsAsync(tags[0]);
+        
+        var result = await _tagManager.SaveTagAsync(tags[0]);
+        
+        Assert.That(result.Name, Is.EqualTo(tags[0].Name));
+        Assert.That(result.Description, Is.EqualTo(tags[0].Description));
+        Assert.That(result.Id , Is.EqualTo(tags[0].Id));
+        Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
+    }
+
+    [Test(Description = "SaveTagAsync | (Tag Exists) | Validation Okay")]
+    public async Task SaveTagAsync_tagexists_okay()
+    {
+        // Arrange
+        var tags = new List<Tag>();
+
+        for (int i = 0; i < 1; i++)
+        {
+            tags.Add(new()
+            {
+                Name = "Tag #" + i,
+                Description = "Description for Tag #" + i
+            });
+        }
+        
+        // Act
+        _tagRepository.Setup(r => r.TagExistsAsync(It.IsAny<string>(), CancellationToken.None))
+            .ReturnsAsync(tags[0]);
+        _validator.Setup(v => v.ValidateAsync(It.IsAny<Tag>(), CancellationToken.None))
+            .ReturnsAsync(true);
+        _tagRepository.Setup(r => r.SaveTagAsync(tags[0],tags[0], CancellationToken.None))
+            .ReturnsAsync(tags[0]);
+        
+        var result = await _tagManager.SaveTagAsync(tags[0]);
+        
+        Assert.That(result.Name, Is.EqualTo(tags[0].Name));
+        Assert.That(result.Description, Is.EqualTo(tags[0].Description));
+        Assert.That(result.Id , Is.EqualTo(tags[0].Id));
+        Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
+    }
+
+    [Test(Description = "SaveTagAsync | (Tag Exists) | Validation Fails")]
+    public async Task SaveTagAsync_tagexists_fail()
+    {
+        // Arrange
+        var tags = new List<Tag>();
+
+        for (int i = 0; i < 1; i++)
+        {
+            tags.Add(new()
+            {
+                Name = "Tag #" + i,
+                Description = "Description for Tag #" + i
+            });
+        }
+        
+        // Act
+        _tagRepository.Setup(r => r.TagExistsAsync(It.IsAny<string>(), CancellationToken.None))
+            .ReturnsAsync(tags[0]);
+        _validator.Setup(v => v.ValidateAsync(It.IsAny<Tag>(), CancellationToken.None))
+            .ReturnsAsync(false);
+        
+        Assert.ThrowsAsync<TagValidationException>(async () => await _tagManager.SaveTagAsync(tags[0]));
+    }
     
-    [Test]
-    public async Task DeleteTagAsync() {}
+    [Test(Description = "DeleteTagAsync | (Tag Exists)")]
+    public async Task DeleteTagAsync_valid() {}
     
-    [Test]
+    [Test(Description = "DeleteTagAsync | (Tag doesn't exist)")]
+    public async Task DeleteTagAsync_invalid() {}
+    
+    [Test(Description = "GetAllTagsAsync")]
     public async Task GetAllTagsAsync() {}
     
-    [Test]
-    public async Task GetTagByIdAsync() {}
+    [Test(Description = "GetTagByIdAsync | (Tag Exists)")]
+    public async Task GetTagByIdAsync_valid() {}
+        
+    [Test(Description = "GetTagByIdAsync | (Tag doesn't exist)")]
+    public async Task GetTagByIdAsync_invalid() {}
 }
