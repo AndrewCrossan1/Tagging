@@ -12,5 +12,11 @@ public interface ITagValidator<TTag> where TTag : class, ITag, new()
 {
     Dictionary<string, List<string>> Errors { get; set; }
     
+    /// <summary>
+    /// ValidateAsync is the central function for ITagValidator entities, this is where you should call your private validator methods
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task<bool> ValidateAsync(TTag tag, CancellationToken cancellationToken = default);
 }
