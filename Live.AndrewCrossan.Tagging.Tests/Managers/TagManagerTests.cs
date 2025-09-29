@@ -203,19 +203,106 @@ public class TagManagerTests
         
         Assert.ThrowsAsync<TagValidationException>(async () => await _tagManager.SaveTagAsync(tags[0]));
     }
-    
+
     [Test(Description = "DeleteTagAsync | (Tag Exists)")]
-    public async Task DeleteTagAsync_valid() {}
-    
-    [Test(Description = "DeleteTagAsync | (Tag doesn't exist)")]
-    public async Task DeleteTagAsync_invalid() {}
-    
-    [Test(Description = "GetAllTagsAsync")]
-    public async Task GetAllTagsAsync() {}
-    
-    [Test(Description = "GetTagByIdAsync | (Tag Exists)")]
-    public async Task GetTagByIdAsync_valid() {}
+    public async Task DeleteTagAsync_valid()
+    {
+        var tag = new Tag
+        {
+            Name = "Tag #" + 1,
+        };
+
+        _tagRepository.Setup(r => r.TagExistsAsync(tag.Id, CancellationToken.None))
+            .ReturnsAsync(tag);
+        _tagRepository.Setup(r => r.DeleteTagAsync(tag.Id, CancellationToken.None))
+            .ReturnsAsync(tag);
         
+        var result = await _tagManager.DeleteTagAsync(tag.Id);
+        
+        Assert.That(result.Name, Is.EqualTo(tag.Name));
+        Assert.That(result.Description, Is.EqualTo(tag.Description));
+        Assert.That(result.Id, Is.EqualTo(tag.Id));
+        Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
+    }
+
+    [Test(Description = "DeleteTagAsync | (Tag doesn't exist)")]
+    public void DeleteTagAsync_invalid()
+    {
+        var tag = new Tag
+        {
+            Name = "Tag #" + 1,
+        };
+
+        _tagRepository.Setup(r => r.TagExistsAsync(tag.Id, CancellationToken.None))
+            .ReturnsAsync((Tag?)null);
+        
+        Assert.ThrowsAsync<KeyNotFoundException>(async () => await _tagManager.DeleteTagAsync(tag.Id));
+        Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
+    }
+
+    [Test(Description = "GetAllTagsAsync")]
+    public async Task GetAllTagsAsync()
+    {
+        var tags = new List<Tag>();
+
+        for (var i = 0; i < 6; i++)
+        {
+            tags.Add(new Tag
+            {
+                Name = "Tag #" + i,
+                Description = "Description for Tag #" + i
+            });
+        }
+
+        _tagRepository.Setup(r => r.GetAllTagsAsync(CancellationToken.None))
+            .ReturnsAsync(tags);
+        
+        var result = await _tagManager.GetAllTagsAsync();
+        
+        Assert.That(result.Count, Is.EqualTo(6));
+        for (var i = 0; i < 6; i++)
+        {
+            Assert.That(result.ElementAt(i).Name, Is.EqualTo(tags[i].Name));
+            Assert.That(result.ElementAt(i).Description, Is.EqualTo(tags[i].Description));
+            Assert.That(result.ElementAt(i).Id, Is.EqualTo(tags[i].Id));
+        }
+        
+        Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
+    }
+
+    [Test(Description = "GetTagByIdAsync | (Tag Exists)")]
+    public async Task GetTagByIdAsync_valid()
+    {
+        var tag = new Tag
+        {
+            Name = "Tag #" + 1,
+            Description = "Description for Tag #" + 1
+        };
+
+        _tagRepository.Setup(r => r.GetTagByIdAsync(tag.Id, CancellationToken.None))
+            .ReturnsAsync(tag);
+        
+        var result = await _tagManager.GetTagByIdAsync(tag.Id);
+        
+        Assert.That(result.Name, Is.EqualTo(tag.Name));
+        Assert.That(result.Description, Is.EqualTo(tag.Description));
+        Assert.That(result.Id, Is.EqualTo(tag.Id));
+        Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
+    }
+
     [Test(Description = "GetTagByIdAsync | (Tag doesn't exist)")]
-    public async Task GetTagByIdAsync_invalid() {}
+    public void GetTagByIdAsync_invalid()
+    {
+        var tag = new Tag
+        {
+            Name = "Tag #" + 1,
+            Description = "Description for Tag #" + 1
+        };
+        
+        _tagRepository.Setup(r => r.GetTagByIdAsync(tag.Id, CancellationToken.None))
+            .ReturnsAsync((Tag?)null);
+
+        Assert.ThrowsAsync<KeyNotFoundException>(async () => await _tagManager.GetTagByIdAsync(tag.Id));
+        Assert.That(_logger.Invocations.Count, Is.EqualTo(1));
+    }
 }
