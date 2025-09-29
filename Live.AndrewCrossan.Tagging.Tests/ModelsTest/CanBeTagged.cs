@@ -47,7 +47,7 @@ public class CanBeTagged
         await using var dbContext = GetInMemoryDbContext();
         
         var newPost = new Post { Title = "My First Post", Content = "Test content" };
-        var newTag = new Tag { Name = "test-tag", Slug = "test-tag" };
+        var newTag = new Tag { Name = "test tag"};
 
         dbContext.Posts.Add(newPost);
         await dbContext.Tags.AddAsync(newTag);
@@ -68,5 +68,6 @@ public class CanBeTagged
         Assert.That(retrievedPost.Tags, Is.Not.Null);
         Assert.That(retrievedPost.Tags.Count, Is.EqualTo(1));
         Assert.That(retrievedPost.Tags.First().Tag.Name, Is.EqualTo(newTag.Name));
+        Assert.That(retrievedPost.Tags.First().Tag.Slug, Is.EqualTo("test-tag"));
     }
 }
