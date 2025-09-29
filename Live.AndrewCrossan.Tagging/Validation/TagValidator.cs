@@ -1,4 +1,5 @@
-﻿using Live.AndrewCrossan.Tagging.Models;
+﻿using System.Text.RegularExpressions;
+using Live.AndrewCrossan.Tagging.Models;
 
 namespace Live.AndrewCrossan.Tagging.Validation;
 
@@ -22,13 +23,27 @@ public class TagValidator<TTag> : ITagValidator<TTag>
     /// <param name="tag">The model to validate</param>
     /// <param name="cancellationToken"></param>
     /// <returns>True, if the validation is successful, false otherwise</returns>
-    public Task<bool> ValidateAsync(TTag tag, CancellationToken cancellationToken = default)
+    public async Task<bool> ValidateAsync(TTag tag, CancellationToken cancellationToken = default)
     {
+        Errors[tag.Name] = new List<string>();
+        
         if (String.IsNullOrEmpty(tag.Name))
         {
-            Errors[tag.Name] = new List<string> { "Tag name cannot be null." };
+            Errors[tag.Name].Add("Name is required.");
+        }
+
+        if (!await OnlyAlphanumeric(tag.Name, cancellationToken))
+        {
+            Errors[tag.Name].Add("Name can only contain alphanumeric characters.");
         }
         
-        return Task.FromResult(Errors.Count == 0);
+        return Errors[tag.Name].Count == 0;
+    }
+
+    private Task<bool> OnlyAlphanumeric(string value, CancellationToken cancellationToken = default)
+    {
+        Regex regex = new("[^a-zA-Z0-9]");
+        
+        return Task.FromResult(regex.IsMatch(value));
     }
 }
