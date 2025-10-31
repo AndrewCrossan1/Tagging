@@ -3,11 +3,26 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <LangVersion>latest</LangVersion>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
+        
         <Version>1.0.0</Version>
+        <Authors>Andrew Crossan</Authors>
+        <Description>A highly generic and flexible ASP.NET Core extension for implementing a relational tagging system on any EF Core entity model.</Description>
+        <PackageTags>tagging;tags;aspnetcore;efcore;entityframeworkcore;extension;library</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+        <!-- 2. Source Link and Documentation (Professional Standards) -->
+        <RepositoryUrl>https://github.com/AndrewCrossan/Tagging</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedAllSources>true</EmbedAllSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,7 +34,16 @@
         <PackageReference Include="NUnit" Version="4.2.2"/>
         <PackageReference Include="NUnit.Analyzers" Version="4.4.0"/>
         <PackageReference Include="NUnit3TestAdapter" Version="4.6.0"/>
-        <None Include="README.md" Pack="true" PackagePath="\" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+        <!-- EF Core is a hard dependency since your extension configures a DbContext -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+
+        <!-- We rely on Abstractions for services/DI extensions -->
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
+
+        <!-- We rely on Options for configuration delegate -->
+        <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
     </ItemGroup>
 
     <ItemGroup>
