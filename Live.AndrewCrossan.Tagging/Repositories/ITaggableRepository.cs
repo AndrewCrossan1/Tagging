@@ -7,8 +7,8 @@ public interface ITaggableRepository<TEntity, TJoin, TTag>
     where TJoin : class, ITaggableEntity<TEntity, TTag>, new()
     where TTag : class, ITag
 {
-    Task AddTagToEntityAsync(TEntity entity, TTag tag, CancellationToken cancellationToken = default);
-    Task RemoveTagFromEntityAsync(TEntity entity, TTag tag, CancellationToken cancellationToken = default);
+    Task AddTagToEntityAsync(TEntity entity, ICollection<TTag> tag, CancellationToken cancellationToken = default);
+    Task<int> RemoveTagFromEntityAsync(TEntity entity, TTag tag, CancellationToken cancellationToken = default);
     Task<List<TTag>> GetTagsForEntityAsync(TEntity entity, CancellationToken cancellationToken = default);
     Task<List<TEntity>> GetEntitiesForTagAsync(TTag tag, CancellationToken cancellationToken = default);
     Task<bool> EntityHasTagAsync(TEntity entity, TTag tag, CancellationToken cancellation = default);
