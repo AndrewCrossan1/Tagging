@@ -16,7 +16,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
         <!-- 2. Source Link and Documentation (Professional Standards) -->
-        <RepositoryUrl>https://github.com/AndrewCrossan/Tagging</RepositoryUrl>
+        <RepositoryUrl>https://github.com/AndrewCrossan1/Tagging</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
